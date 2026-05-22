@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Innovatech Chile - Dashboard</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f7f6; 
+            color: #333; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        header { 
+            background-color: #0056b3; 
+            color: white; 
+            padding: 15px; 
+            border-radius: 5px; 
+            text-align: center; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+            background: white; 
+        }
+        th, td { 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            text-align: left; 
+        }
+        th { 
+            background-color: #0056b3; 
+            color: white; 
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Innovatech Chile</h1>
+        <p>Dashboard de Migración Lift & Shift</p>
+    </header>
+    
+    <h2>Estado de Servidores On-Premise</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Hostname</th>
+                <th>Dirección IP</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-servidores">
+            <tr><td colspan="4">Cargando infraestructura...</td></tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Llama a la ruta que configuraremos en Nginx y que apunta al Backend
+        fetch('/api/servidores')
+            .then(response => {
+                if (!response.ok) throw new Error("Error en la respuesta del servidor");
+                return response.json();
+            })
+            .then(data => {
+                const tbody = document.getElementById('tabla-servidores');
+                tbody.innerHTML = '';
+                data.forEach(srv => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${srv.id}</td>
+                            <td>${srv.hostname}</td>
+                            <td>${srv.ip_address}</td>
+                            <td>${srv.estado}</td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                document.getElementById('tabla-servidores').innerHTML = '<tr><td colspan="4" style="color:red; text-align:center;"><strong>Error de conexión con el Backend.</strong><br>Verifica que la instancia Backend esté encendida y la IP en default.conf sea correcta.</td></tr>';
+            });
+    </script>
+</body>
+</html>
